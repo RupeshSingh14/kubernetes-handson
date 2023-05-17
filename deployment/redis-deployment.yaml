@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-redis
+  annotations:  # for recording the rollout messages, here we are using standard kubernetes.io for same but this can be also customize
+    kubernetes.io/change-cause: "deploying v1"
+spec:
+  minReadySeconds: 10   # custom spring boot apps take time to get running, so minReadySeconds will not make this apps available unless defined wait time.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: 
+      #maxSurge: "66%" # can be number of percentage
+      maxUnavailable: 1 # no of previous running pods that can be unavialable at a time ie.. can be brought down
+  selector:
+    matchLabels:
+      app: redis
+  replicas: 1
+  template: 
+    metadata: 
+      labels:  
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:6
+        ports:
+        - name: "redis-port"
+          containerPort: 6379

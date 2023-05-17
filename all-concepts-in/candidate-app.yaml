@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candidate-app
+spec:
+  selector:
+    matchLabels:
+      app: candidate-app  
+  replicas: 1
+  template: 
+    metadata: 
+      labels:  
+        app: candidate-app 
+    spec:
+      containers:
+      - name: candidate-app
+        image: vinsdocker/k8s-dice-candidate
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - secretRef:
+            name: mongo-candidate-secret
+        env:
+        - name: "job.service.url"
+          value: "http://job-service:8080/job/" # since service name is also job-servce, so no need to change
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 10
+          failureThreshold: 30
+        # livenessProbe:
+        #   httpGet:
+        #     path: /live.html
+        #     port: 80
+        #   periodSeconds: 1
+        #   failureThreshold: 30  
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 10
+          failureThreshold: 3
+        resources:
+          requests: 
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 2000Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: candidate-service
+spec:
+  selector:
+    app: candidate-app
+  ports:
+  - port: 8080
+    targetPort: 8080

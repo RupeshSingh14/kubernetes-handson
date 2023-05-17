@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: my-replicaset  # this name takes precendence like pod/my-replicaset-2d5nr 
+spec:
+  selector:
+    matchLabels:
+      app: my-app  #can have multiple labels
+  replicas: 3
+  template: 
+    metadata: 
+      name: my-pod  # this name is not used to create the replicat set
+      labels:  # any one of the below labels should be same ie.. match with matchLabels defined above at line 7.
+        app: my-app
+        team: team-a 
+    spec:
+      containers:
+      - name: nginx
+        image: nginx

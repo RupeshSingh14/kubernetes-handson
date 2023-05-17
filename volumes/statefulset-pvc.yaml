@@ -1,0 +1,42 @@
+#kubectl port-forward pod/my-app-0 8080:80
+#kubectl port-forward pod/my-app-1 8080:80
+#kubectl port-forward pod/my-app-2 8080:80
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-app
+spec:
+  selector:
+    matchLabels:
+      app: my-app  
+  replicas: 3
+  template: 
+    metadata: 
+      labels:  
+        app: my-app 
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        startupProbe:
+          exec:
+            command:
+            - "/bin/sh"
+            - "-c"
+            - 'echo "$(hostname)</br>" >> /usr/share/nginx/html/index.html'
+        volumeMounts:
+        - name: my-pvc
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata: 
+      name: my-pvc
+    spec: 
+      storageClassName: standard  #this is default available in local kind cluster
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1G  
+
+

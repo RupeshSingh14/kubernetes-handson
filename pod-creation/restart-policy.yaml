@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  restartPolicy: OnFailure # Always(by default), Never and OnFailure
+  containers:
+  - name: ubuntu
+    image: ubuntu

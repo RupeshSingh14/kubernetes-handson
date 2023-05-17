@@ -1,0 +1,49 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: job-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: job-app
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 30 # usually it is kept 70 -80
+  # - type: Resource  # not used since nginx uses static content
+  #   resource:
+  #     name: memory
+  #     target:
+  #       type: AverageValue
+  #       averageValue: [ ? ]    
+  behavior: 
+    scaleDown:
+      stabilizationWindowSeconds: 10 # usually used 300 ie 5mins         
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: candidate-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: candidate-app
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 30 # usually it is kept 70 -80  
+  behavior: 
+    scaleDown:
+      stabilizationWindowSeconds: 10 # usually used 300 ie 5mins   

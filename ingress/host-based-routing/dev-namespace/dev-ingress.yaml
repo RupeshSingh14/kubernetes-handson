@@ -1,0 +1,17 @@
+# http://dev.my-app.com:8080/
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev-ingress
+spec:
+  rules:
+  - host: "dev.my-app.com"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dev-service
+            port:
+              number: 80
